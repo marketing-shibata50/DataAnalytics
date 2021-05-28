@@ -17,7 +17,7 @@ st.write("""
 def get_spred():
     # スプレッドシートの読み込み
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    credentials = Credentials.from_service_account_file('service_account.json', scopes=scopes)
+    credentials = Credentials.from_service_account_file('liny/service_account.json', scopes=scopes)
     gc = gspread.authorize(credentials)
     SP_SHEET_KEY_MEMBER = '19kRuMbdn5zyEC1pcioTMfju5mtYi5cFx7SDYtuRV2Ws'
     sh_member = gc.open_by_key(SP_SHEET_KEY_MEMBER)

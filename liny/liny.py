@@ -16,13 +16,9 @@ st.write("""
 
 def get_spred():
     # スプレッドシートの読み込み
-    st.write('E01')
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    st.write('E02')
     credentials = Credentials.from_service_account_file('liny/service_account.json', scopes=scopes)
-    st.write('E03')
     gc = gspread.authorize(credentials)
-    st.write('E04')
     SP_SHEET_KEY_MEMBER = '13QemJFcysc703EpF7PsnJWDQyO6KiXFPWiGBkQ-cw6U'
     sh_member = gc.open_by_key(SP_SHEET_KEY_MEMBER)
     worksheet = sh_member.worksheet('貼付：Liny')
@@ -33,7 +29,7 @@ def get_spred():
     register_L['Month'] = register_L['登録(フォロー)日時'].dt.strftime("%Y-%m")
     return register_L
 
-# @st.cache
+@st.cache
 def get_data():
     db = pd.DataFrame()
     db = get_spred()

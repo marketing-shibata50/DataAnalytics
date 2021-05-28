@@ -1,9 +1,6 @@
 streamlit==0.82.0
-pandas
-numpy
-altair
-gspread_dataframe
-set_with_dataframe
-gspread
-google.oauth2.service_account
-Credentials
+pandas==1.2.4
+numpy==1.20.3
+altair==4.1.0
+gspread-dataframe==3.2.1
+gspread==3.7.0

@@ -61,9 +61,9 @@ def get_chart(data):
             axis = None,
             scale=alt.Scale(domain=[ymin1, ymax1]))
     )
-    line3 = base.mark_line(stroke='#ffffff').encode(
+    line3 = base.mark_line(stroke='#ffff00').encode(
         alt.Y('全体%',
-            axis=alt.Axis(title='全体%', titleColor='#ffffff'),
+            axis=alt.Axis(title='全体%', titleColor='#ffff00'),
             scale=alt.Scale(domain=[ymin2, ymax2])
             )
     )

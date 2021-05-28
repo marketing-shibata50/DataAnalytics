@@ -88,11 +88,9 @@ try:
     e_time = np.datetime64(e_time)
     temp_db = db[(db['Date'] >= s_time) & (db['Date'] <= e_time)]
 
-    data = pd.pivot_table(data = temp_db, values = ["友だち", "卒業年度", "個人情報"], aggfunc ="count", index = "Date", margins=False, fill_value=0)
+    data = pd.pivot_table(data = temp_db, values = ["友だち", "個人情報"], aggfunc ="count", index = "Date", margins=False, fill_value=0)
     # data['卒業年度%'] = (data['卒業年度'] / data['友だち']).map('{:.2%}'.format)
     # data['個人情報%'] = (data['個人情報'] / data['卒業年度']).map('{:.2%}'.format)
-    data['卒業年度%'] = (data['卒業年度'] / data['友だち'])
-    data['個人情報%'] = (data['個人情報'] / data['卒業年度'])
     data['全体%'] = (data['個人情報'] / data['友だち'])
     data.index = data.index.strftime('%Y/%m/%d')
     data = data.T
@@ -116,11 +114,9 @@ try:
     st.write(f"""
     ###  月別の数字
     """)
-    mdata = pd.pivot_table(data = temp_db, values = ["友だち", "卒業年度", "個人情報"], aggfunc ="count", index = "Month", margins=False, fill_value=0)
+    mdata = pd.pivot_table(data = temp_db, values = ["友だち", "個人情報"], aggfunc ="count", index = "Month", margins=False, fill_value=0)
     # data['卒業年度%'] = (data['卒業年度'] / data['友だち']).map('{:.2%}'.format)
     # data['個人情報%'] = (data['個人情報'] / data['卒業年度']).map('{:.2%}'.format)
-    mdata['卒業年度%'] = (mdata['卒業年度'] / mdata['友だち'])
-    mdata['個人情報%'] = (mdata['個人情報'] / mdata['卒業年度'])
     mdata['全体%'] = (mdata['個人情報'] / mdata['友だち'])
     mdata = mdata.T
     st.write(mdata)

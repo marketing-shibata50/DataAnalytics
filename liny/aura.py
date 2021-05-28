@@ -29,7 +29,6 @@ def get_spred():
     register_L['Month'] = register_L['友達追加日時'].dt.strftime("%Y-%m")
     return register_L
 
-@st.cache
 def get_data():
     db = pd.DataFrame()
     db = get_spred()

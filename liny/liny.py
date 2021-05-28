@@ -43,7 +43,7 @@ def get_data():
 
 def get_chart(data):
     data = data.reset_index()
-    ymin1 = data['友だち'].min()
+    ymin1 = 0
     ymax1 = data['友だち'].max()
     ymin2 = 0
     ymax2 = 1

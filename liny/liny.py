@@ -16,9 +16,13 @@ st.write("""
 
 def get_spred():
     # スプレッドシートの読み込み
+    st.write('E01')
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    st.write('E02')
     credentials = Credentials.from_service_account_file('service_account.json', scopes=scopes)
+    st.write('E03')
     gc = gspread.authorize(credentials)
+    st.write('E04')
     SP_SHEET_KEY_MEMBER = '13QemJFcysc703EpF7PsnJWDQyO6KiXFPWiGBkQ-cw6U'
     sh_member = gc.open_by_key(SP_SHEET_KEY_MEMBER)
     worksheet = sh_member.worksheet('貼付：Liny')
@@ -31,11 +35,8 @@ def get_spred():
 
 # @st.cache
 def get_data():
-    st.write('E01')
     db = pd.DataFrame()
-    st.write('E02')
     db = get_spred()
-    st.write('E03')
     db = db[['登録(フォロー)日時', 'ユーザーブロック', '流入時シナリオ', '希望勤務地', '個人情報入力経路', '流入経路', '流入経路詳細', '卒業年度', '電話番号']]
     db = db.rename(columns={'登録(フォロー)日時': 'Date', 'ユーザーブロック': '友だち', '電話番号': '個人情報'})
     db['Month'] = db['Date'].dt.strftime('%Y-%m')

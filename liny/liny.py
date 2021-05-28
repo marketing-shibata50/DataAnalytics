@@ -31,8 +31,11 @@ def get_spred():
 
 # @st.cache
 def get_data():
+    st.write('E01')
     db = pd.DataFrame()
+    st.write('E02')
     db = get_spred()
+    st.write('E03')
     db = db[['登録(フォロー)日時', 'ユーザーブロック', '流入時シナリオ', '希望勤務地', '個人情報入力経路', '流入経路', '流入経路詳細', '卒業年度', '電話番号']]
     db = db.rename(columns={'登録(フォロー)日時': 'Date', 'ユーザーブロック': '友だち', '電話番号': '個人情報'})
     db['Month'] = db['Date'].dt.strftime('%Y-%m')

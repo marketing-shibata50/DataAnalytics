@@ -45,8 +45,8 @@ def get_chart(data):
     data = data.reset_index()
     ymin1 = data['友だち'].min()
     ymax1 = data['友だち'].max()
-    ymin2 = data['全体%'].min()
-    ymax2 = data['全体%'].max()
+    ymin2 = 0
+    ymax2 = 1
     base = alt.Chart(data).encode(
         alt.X('Date:T', axis=alt.Axis(title=None))
     )

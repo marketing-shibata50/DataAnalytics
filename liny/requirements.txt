@@ -1,7 +1,6 @@
 streamlit==0.82.0
 pandas
 numpy
-datetime
 altair
 gspread_dataframe
 set_with_dataframe

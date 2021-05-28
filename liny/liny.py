@@ -19,7 +19,7 @@ def get_spred():
     st.write('E01')
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
     st.write('E02')
-    credentials = Credentials.from_service_account_file('service_account.json', scopes=scopes)
+    credentials = Credentials.from_service_account_file('/liny/service_account.json', scopes=scopes)
     st.write('E03')
     gc = gspread.authorize(credentials)
     st.write('E04')

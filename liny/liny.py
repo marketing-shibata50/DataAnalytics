@@ -94,9 +94,9 @@ temp_db = db[(db['Date'] >= s_time) & (db['Date'] <= e_time)]
 temp_db['Date'] = temp_db['Date'].dt.strftime('%Y/%m/%d')
 
 st.write("# 全体")
-# st.write("##  日別の数字")
-# chart = calc_db(temp_db, 'Date')
-# st.altair_chart(chart, use_container_width=True)
+st.write("##  日別の数字")
+chart = calc_db(temp_db, 'Date')
+st.altair_chart(chart, use_container_width=True)
 
 st.write("##  月別の数字")
 chart = calc_db(temp_db, 'Month')
@@ -105,9 +105,9 @@ st.altair_chart(chart, use_container_width=True)
 st.write("# 就活市場経由")
 temp_db_s = temp_db[temp_db.流入経路.eq('就活市場')]
 
-# st.write("##  日別の数字")
-# chart = calc_db(temp_db_s, 'Date')
-# st.altair_chart(chart, use_container_width=True)
+st.write("##  日別の数字")
+chart = calc_db(temp_db_s, 'Date')
+st.altair_chart(chart, use_container_width=True)
 
 st.write("##  月別の数字")
 chart = calc_db(temp_db_s, 'Month')
@@ -116,9 +116,9 @@ st.altair_chart(chart, use_container_width=True)
 st.write("# 広告経由")
 temp_db_a = temp_db[temp_db.流入経路.eq('LP経由')]
 
-# st.write("##  日別の数字")
-# chart = calc_db(temp_db_a, 'Date')
-# st.altair_chart(chart, use_container_width=True)
+st.write("##  日別の数字")
+chart = calc_db(temp_db_a, 'Date')
+st.altair_chart(chart, use_container_width=True)
 
 st.write("##  月別の数字")
 chart = calc_db(temp_db_a, 'Month')

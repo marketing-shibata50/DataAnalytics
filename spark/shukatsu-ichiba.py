@@ -17,7 +17,7 @@ import re
 def read_spred_keys():
     # スプレッドシートの読み込み
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    credentials = Credentials.from_service_account_file('service_account.json', scopes=scopes)
+    credentials = Credentials.from_service_account_file('spark/service_account.json', scopes=scopes)
     gc = gspread.authorize(credentials)
 
     SP_SHEET_KEY_SPARK = '1Tg7M8InNGxVmtQD01ujK6tFWTrmEAyU1pxqo9XCFtIg'

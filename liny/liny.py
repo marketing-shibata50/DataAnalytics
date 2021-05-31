@@ -72,64 +72,60 @@ def get_chart(data):
     )
     return chart
 
-try:
-    st.write(""" ## 表示日数選択 """)
-    db = get_data()
+# try:
 
-    mindate = dt.date(2020,8,1)
-    maxdate = db['Date'].max()
+st.write(""" ## 表示日数選択 """)
+db = get_data()
+# db = db.loc[]
 
-    s_time, e_time = st.date_input(
-        '表示したい期間を入力してください',
-        [mindate, maxdate],
-        min_value = mindate,
-        max_value = maxdate
-    )
+mindate = dt.date(2020,8,1)
+maxdate = db['Date'].max()
 
-    s_time = np.datetime64(s_time)
-    e_time = np.datetime64(e_time)
-    temp_db = db[(db['Date'] >= s_time) & (db['Date'] <= e_time)]
+s_time, e_time = st.date_input(
+    '表示したい期間を入力してください',
+    [mindate, maxdate],
+    min_value = mindate,
+    max_value = maxdate
+)
 
-    data = pd.pivot_table(data = temp_db, values = ["友だち", "卒業年度", "個人情報"], aggfunc ="count", index = "Date", margins=False, fill_value=0)
-    # data['卒業年度%'] = (data['卒業年度'] / data['友だち']).map('{:.2%}'.format)
-    # data['個人情報%'] = (data['個人情報'] / data['卒業年度']).map('{:.2%}'.format)
-    data['卒業年度%'] = (data['卒業年度'] / data['友だち'])
-    data['個人情報%'] = (data['個人情報'] / data['卒業年度'])
-    data['全体%'] = (data['個人情報'] / data['友だち'])
-    data.index = data.index.strftime('%Y/%m/%d')
-    data = data.T
+s_time = np.datetime64(s_time)
+e_time = np.datetime64(e_time)
+temp_db = db[(db['Date'] >= s_time) & (db['Date'] <= e_time)]
 
-    items = st.multiselect(
-        '表示項目を選択してください',
-        list(data.index),
-        (['友だち', '個人情報', '全体%'])
-    )
+data = pd.pivot_table(data = temp_db, values = ["友だち", "卒業年度", "個人情報"], aggfunc ="count", index = "Date", margins=False, fill_value=0)
+# data['卒業年度%'] = (data['卒業年度'] / data['友だち']).map('{:.2%}'.format)
+# data['個人情報%'] = (data['個人情報'] / data['卒業年度']).map('{:.2%}'.format)
+data['卒業年度%'] = (data['卒業年度'] / data['友だち'])
+data['個人情報%'] = (data['個人情報'] / data['卒業年度'])
+data['全体%'] = (data['個人情報'] / data['友だち'])
+data.index = data.index.strftime('%Y/%m/%d')
+data = data.T
 
-    st.write(f"""
-    ###  日別の数字
-    """)
-    st.write(data)
-    temp_data = data.loc[items].T
-    # temp_data = temp_data.T.reset_index()
-    # temp_data = pd.melt(temp_data, id_vars=['Date'])
-    chart = get_chart(temp_data)
-    st.altair_chart(chart, use_container_width=True)
+st.write(f"""
+###  日別の数字
+""")
+st.write(data)
+temp_data = data.T
+# temp_data = temp_data.T.reset_index()
+# temp_data = pd.melt(temp_data, id_vars=['Date'])
+chart = get_chart(temp_data)
+st.altair_chart(chart, use_container_width=True)
 
-    st.write(f"""
-    ###  月別の数字
-    """)
-    mdata = pd.pivot_table(data = temp_db, values = ["友だち", "卒業年度", "個人情報"], aggfunc ="count", index = "Month", margins=False, fill_value=0)
-    # data['卒業年度%'] = (data['卒業年度'] / data['友だち']).map('{:.2%}'.format)
-    # data['個人情報%'] = (data['個人情報'] / data['卒業年度']).map('{:.2%}'.format)
-    mdata['卒業年度%'] = (mdata['卒業年度'] / mdata['友だち'])
-    mdata['個人情報%'] = (mdata['個人情報'] / mdata['卒業年度'])
-    mdata['全体%'] = (mdata['個人情報'] / mdata['友だち'])
-    mdata = mdata.T
-    st.write(mdata)
-    temp_mdata = mdata.loc[items]
-    temp_mdata = temp_mdata.T.reset_index()
-    temp_mdata = temp_mdata.rename(columns={'Month': 'Date'})
-    chart = get_chart(temp_mdata)
-    st.altair_chart(chart, use_container_width=True)
-except:
-    st.error("おっと！何かエラーが起きているようです。")
+st.write(f"""
+###  月別の数字
+""")
+mdata = pd.pivot_table(data = temp_db, values = ["友だち", "卒業年度", "個人情報"], aggfunc ="count", index = "Month", margins=False, fill_value=0)
+# data['卒業年度%'] = (data['卒業年度'] / data['友だち']).map('{:.2%}'.format)
+# data['個人情報%'] = (data['個人情報'] / data['卒業年度']).map('{:.2%}'.format)
+mdata['卒業年度%'] = (mdata['卒業年度'] / mdata['友だち'])
+mdata['個人情報%'] = (mdata['個人情報'] / mdata['卒業年度'])
+mdata['全体%'] = (mdata['個人情報'] / mdata['友だち'])
+mdata = mdata.T
+st.write(mdata)
+temp_mdata = mdata
+temp_mdata = temp_mdata.T.reset_index()
+temp_mdata = temp_mdata.rename(columns={'Month': 'Date'})
+chart = get_chart(temp_mdata)
+st.altair_chart(chart, use_container_width=True)
+# except:
+#     st.error("おっと！何かエラーが起きているようです。")

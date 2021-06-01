@@ -1,4 +1,3 @@
-import re
 from altair.vegalite.v4.api import concat
 from altair.vegalite.v4.schema.channels import Column
 from pandas.core import groupby
@@ -8,11 +7,8 @@ import numpy as np
 import altair as alt
 import gspread
 from google.oauth2.service_account import Credentials
-from bs4 import BeautifulSoup
-import requests
 import datetime as dt
 from gspread_dataframe import set_with_dataframe
-import re
 
 def read_spred_keys():
     # スプレッドシートの読み込み

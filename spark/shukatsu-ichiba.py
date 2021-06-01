@@ -140,7 +140,7 @@ def L_calc():
     register_L = register_L.loc[register_L['電話番号'] != 0]
     return make_register(register_L)
 
-def get_chart(data, item):
+def get_chart(data, span, item):
     data = data.reset_index()
     ymin = 0
     ymax = data[item].max()
@@ -149,7 +149,7 @@ def get_chart(data, item):
         alt.Chart(data)
         .mark_line(opacity=0.8, clip=True)
         .encode(
-            x="Month",
+            x=span,
             y=alt.Y(item, scale=alt.Scale(domain=(ymin, ymax))),
             color='ID:N'
         )
@@ -221,22 +221,28 @@ place = st.selectbox('確認したい"設置場所"を入力してください',
 category = st.selectbox('確認したい"カテゴリ"を入力してください', CATEGORY)
 temp_month = temp_month.loc[temp_month['設置位置'] == place]
 temp_month = temp_month.loc[temp_month['ニーズ'] == category]
-# st.write(temp_month)
 
+
+st.write('## 月別データ')
 display_month = temp_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
 st.write(display_month.T)
 
-chart = get_chart(temp_month, 'Imp')
+st.write('### Imp')
+chart = get_chart(temp_month, 'Month', 'Imp')
 st.altair_chart(chart, use_container_width=True)
 
-chart = get_chart(temp_month, 'CT')
+st.write('### CT')
+chart = get_chart(temp_month, 'Month', 'CT')
 st.altair_chart(chart, use_container_width=True)
 
-chart = get_chart(temp_month, 'CV')
+st.write('### CV')
+chart = get_chart(temp_month, 'Month', 'CV')
 st.altair_chart(chart, use_container_width=True)
 
-chart = get_chart(temp_month, 'CTR')
+st.write('### CTR')
+chart = get_chart(temp_month, 'Month', 'CTR')
 st.altair_chart(chart, use_container_width=True)
 
-chart = get_chart(temp_month, 'CVR')
+st.write('### CVR')
+chart = get_chart(temp_month, 'Month', 'CVR')
 st.altair_chart(chart, use_container_width=True)

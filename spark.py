@@ -402,7 +402,6 @@ elif MEDIA == 'digmedia':
         worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_R'])
         temp_data = worksheet.get_all_values()
         register_R = pd.DataFrame(temp_data[1:], columns=temp_data[0]).rename(columns={'登録日時': 'Date'})
-        st.write(register_R)
         return make_register(register_R)
 
     @st.cache(allow_output_mutation=True)

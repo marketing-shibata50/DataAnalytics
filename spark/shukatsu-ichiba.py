@@ -149,7 +149,7 @@ def get_chart(data, span, item):
         alt.Chart(data)
         .mark_line(opacity=0.8, clip=True)
         .encode(
-            x=span+':T',
+            x=span,
             y=alt.Y(item, scale=alt.Scale(domain=(ymin, ymax))),
             color='ID:N'
         )

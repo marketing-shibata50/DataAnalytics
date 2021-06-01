@@ -185,62 +185,62 @@ master = master[['ID', '進捗', '担当', 'ニーズ', '設置位置']]
 master = master.replace(r'^\s*$', 0, regex=True)
 master = master.loc[master['ID']!=0]
 
-# # 表示回数の計算
-# imp = imp_calc()
-# imp = limit_day(imp, s_time, e_time)
+# 表示回数の計算
+imp = imp_calc()
+imp = limit_day(imp, s_time, e_time)
 
-# # CT数の計算
-# ct = ct_calc()
-# ct = limit_day(ct, s_time, e_time)
+# CT数の計算
+ct = ct_calc()
+ct = limit_day(ct, s_time, e_time)
 
-# # 会員登録の計算
-# val_register_R = R_calc()
+# 会員登録の計算
+val_register_R = R_calc()
 
-# # LINE登録の計算
-# val_register_L = L_calc()
+# LINE登録の計算
+val_register_L = L_calc()
 
-# val_register = pd.concat([val_register_R, val_register_L])
-# val_register = limit_day(val_register, s_time, e_time)
-# val_register = make_datetime(val_register)
+val_register = pd.concat([val_register_R, val_register_L])
+val_register = limit_day(val_register, s_time, e_time)
+val_register = make_datetime(val_register)
 
-# val_daily = pd.merge(imp, ct, on=['Date', 'ID'], how='left')
-# val_daily = pd.merge(val_daily, val_register, on=['Date', 'ID'], how='left')
-# val_daily = val_daily.loc[val_daily['Imp'] != 0]
-# val_daily = calc_per(val_daily)
+val_daily = pd.merge(imp, ct, on=['Date', 'ID'], how='left')
+val_daily = pd.merge(val_daily, val_register, on=['Date', 'ID'], how='left')
+val_daily = val_daily.loc[val_daily['Imp'] != 0]
+val_daily = calc_per(val_daily)
 
-# val_month = val_daily
-# val_month['Date'] = pd.to_datetime(val_month['Date'])
-# val_month['Month'] = val_month['Date'].dt.strftime('%Y-%m')
-# del val_month['Date']
-# val_month = val_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV']]
-# val_month = val_month.reset_index()
-# val_month = calc_per(val_month)
+val_month = val_daily
+val_month['Date'] = pd.to_datetime(val_month['Date'])
+val_month['Month'] = val_month['Date'].dt.strftime('%Y-%m')
+del val_month['Date']
+val_month = val_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV']]
+val_month = val_month.reset_index()
+val_month = calc_per(val_month)
 
-# STATUS = list(val_daily['進捗'].unique())
-# PLACE = list(val_daily['設置位置'].unique())
-# CATEGORY = list(val_daily['ニーズ'].unique())
+STATUS = list(val_daily['進捗'].unique())
+PLACE = list(val_daily['設置位置'].unique())
+CATEGORY = list(val_daily['ニーズ'].unique())
 
-# temp_month = val_month
-# place = st.selectbox('確認したい"設置場所"を入力してください', PLACE)
-# category = st.selectbox('確認したい"カテゴリ"を入力してください', CATEGORY)
-# temp_month = temp_month.loc[temp_month['設置位置'] == place]
-# temp_month = temp_month.loc[temp_month['ニーズ'] == category]
-# # st.write(temp_month)
+temp_month = val_month
+place = st.selectbox('確認したい"設置場所"を入力してください', PLACE)
+category = st.selectbox('確認したい"カテゴリ"を入力してください', CATEGORY)
+temp_month = temp_month.loc[temp_month['設置位置'] == place]
+temp_month = temp_month.loc[temp_month['ニーズ'] == category]
+# st.write(temp_month)
 
-# display_month = temp_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
-# st.write(display_month.T)
+display_month = temp_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
+st.write(display_month.T)
 
-# chart = get_chart(temp_month, 'Imp')
-# st.altair_chart(chart, use_container_width=True)
+chart = get_chart(temp_month, 'Imp')
+st.altair_chart(chart, use_container_width=True)
 
-# chart = get_chart(temp_month, 'CT')
-# st.altair_chart(chart, use_container_width=True)
+chart = get_chart(temp_month, 'CT')
+st.altair_chart(chart, use_container_width=True)
 
-# chart = get_chart(temp_month, 'CV')
-# st.altair_chart(chart, use_container_width=True)
+chart = get_chart(temp_month, 'CV')
+st.altair_chart(chart, use_container_width=True)
 
-# chart = get_chart(temp_month, 'CTR')
-# st.altair_chart(chart, use_container_width=True)
+chart = get_chart(temp_month, 'CTR')
+st.altair_chart(chart, use_container_width=True)
 
-# chart = get_chart(temp_month, 'CVR')
-# st.altair_chart(chart, use_container_width=True)
+chart = get_chart(temp_month, 'CVR')
+st.altair_chart(chart, use_container_width=True)

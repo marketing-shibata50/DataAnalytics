@@ -1,6 +1,7 @@
 import re
 from altair.vegalite.v4.api import concat
 from altair.vegalite.v4.schema.channels import Column
+from pandas.core import groupby
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -16,7 +17,7 @@ import re
 def read_spred_keys():
     # スプレッドシートの読み込み
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    credentials = Credentials.from_service_account_file('service_account.json', scopes=scopes)
+    credentials = Credentials.from_service_account_file('spark/service_account.json', scopes=scopes)
     gc = gspread.authorize(credentials)
 
     SP_SHEET_KEY_SPARK = '1Tg7M8InNGxVmtQD01ujK6tFWTrmEAyU1pxqo9XCFtIg'
@@ -67,94 +68,179 @@ def get_chart(values_month):
     )
     return chart
 
+def make_register(db):
+    db = db[['Date', 'ID']]
+
+    db['pattern'] = db['ID'].str[-1]
+    temp = db.loc[db['pattern']=='p']
+    temp['ID'] = temp['ID'].str[:-1]
+    db['ID'].loc[db['pattern']=='p'] = temp['ID']
+    db['CV'] = 1
+    db['Date'] = db['Date'].str.split(' ', expand=True)[0]
+
+    db = pd.pivot_table(data = db, values = "CV", aggfunc ="count", index = ["Date", "ID"], margins=False, fill_value=0)
+    db = db.reset_index()
+    db['CV'] = db['CV'].astype(int)
+    return db
+
+def make_datetime(db):
+    db['Date'] = pd.to_datetime(db['Date'])
+    db['Date'] = db['Date'].dt.strftime('%Y/%m/%d')
+    return db
+
+def calc_per(db):
+    db['CTR'] = db['CT'] / db['Imp']
+    db['CVR'] = db['CV'] / db['CT']
+    db = pd.merge(db, master, on='ID', how='left')
+    db = db.fillna(0)
+    return db
+
+def limit_day(db, s_time, e_time):
+    s_time = np.datetime64(s_time)
+    e_time = np.datetime64(e_time)
+    db['Date'] = pd.to_datetime(db['Date'])
+    temp_db = db[(db['Date'] >= s_time) & (db['Date'] <= e_time)]
+    temp_db['Date'] = temp_db['Date'].dt.strftime('%Y/%m/%d')
+    return temp_db
+
+@st.cache(allow_output_mutation=True)
+def imp_calc():
+    worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_IMP'])
+    temp_imp = worksheet.get_all_values()
+    imp = pd.DataFrame(temp_imp[6:], columns=temp_imp[4]).rename(columns={'ID': 'Date'})
+    imp = pd.melt(imp, id_vars=['Date']).rename(columns={'value': 'Imp', 'variable': 'ID'})
+    imp = imp.replace(r'^\s*$', 0, regex=True)
+    imp['Imp'] = imp['Imp'].astype(int)
+    return make_datetime(imp)
+
+@st.cache(allow_output_mutation=True)
+def ct_calc():
+    worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_CT'])
+    temp_ct = worksheet.get_all_values()
+    ct = pd.DataFrame(temp_ct[15:], columns=temp_ct[14]).rename(columns={'Total Events': 'CT', 'Event Label': 'ID'})
+    ct['pattern'] = ct['ID'].str[-1]
+    temp = ct.loc[ct['pattern']=='p']
+    temp['ID'] = temp['ID'].str[:-1]
+    ct['ID'].loc[ct['pattern']=='p'] = temp['ID']
+    ct['CT'] = ct['CT'].astype(int)
+    ct = ct.groupby(['Date', 'ID']).sum()['CT']
+    ct = ct.reset_index()
+    return make_datetime(ct)
+
+@st.cache(allow_output_mutation=True)
+def R_calc():
+    worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_R'])
+    temp_data = worksheet.get_all_values()
+    register_R = pd.DataFrame(temp_data[1:], columns=temp_data[0]).rename(columns={'ID': '学生ID', '登録日時': 'Date', '経由点(バナー)': 'ID'})
+    return make_register(register_R)
+
+@st.cache(allow_output_mutation=True)
+def L_calc():
+    worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_L'])
+    temp_data = worksheet.get_all_values()
+    register_L = pd.DataFrame(temp_data[2:], columns=temp_data[1]).rename(columns={'ID': '学生ID', '登録(フォロー)日時': 'Date', '流入経路詳細': 'ID'})
+    # register_L = register_L.loc[]
+    register_L = register_L.replace(r'^\s*$', 0, regex=True)
+    register_L = register_L.loc[register_L['電話番号'] != 0]
+    return make_register(register_L)
+
+def get_chart(data, item):
+    data = data.reset_index()
+    ymin = 0
+    ymax = data[item].max()
+    # st.write(data)
+    chart = (
+        alt.Chart(data)
+        .mark_line(opacity=0.8, clip=True)
+        .encode(
+            x="Month",
+            y=alt.Y(item, scale=alt.Scale(domain=(ymin, ymax))),
+            color='ID:N'
+        )
+    )
+    return chart
+
 # スプレッドの情報抜き出し
 sh_spark, sh_member, sh_master = read_spred_keys()
 SP_SHEET, SP_SHEET_REGISTER = read_spred_tab()
 
-# 初期設定
-val = pd.DataFrame()
+st.write(""" # 表示日数選択 """)
+
+dt_now = dt.datetime.now()
+mindate = dt.date(2021,1,1)
+maxdate = dt.date(dt_now.year, dt_now.month, dt_now.day)
+
+s_time, e_time = st.date_input(
+    '表示したい期間を入力してください',
+    [mindate, maxdate],
+    min_value = mindate,
+    max_value = maxdate
+)
 
 # マスターデータ
 worksheet = sh_master.worksheet('マスターデータ')
 temp_master = worksheet.get_all_values()
 master = pd.DataFrame(temp_master[4:], columns=temp_master[3])
-master = master[['ID', '進捗', '担当', 'ニーズ']]
-st.write(master)
+master = master[['ID', '進捗', '担当', 'ニーズ', '設置位置']]
+master = master.replace(r'^\s*$', 0, regex=True)
+master = master.loc[master['ID']!=0]
 
 # 表示回数の計算
-imp = pd.DataFrame()
-worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_IMP'])
-temp_imp = worksheet.get_all_values()
-imp = pd.DataFrame(temp_imp[6:], columns=temp_imp[4])
-imp = imp.rename(columns={'ID': 'Date'})
-imp['Date'] = pd.to_datetime(imp['Date'])
-imp['Date'] = imp['Date'].dt.strftime('%Y/%m/%d')
-imp = imp.replace(r'^\s*$', 0, regex=True)
-imp = pd.melt(imp, id_vars=['Date']).rename(columns={'value': 'Count', 'variable': 'ID'})
-imp['type'] = 'imp'
-val = imp
+imp = imp_calc()
+imp = limit_day(imp, s_time, e_time)
 
 # CT数の計算
-ct = pd.DataFrame()
-worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_CT'])
-temp_ct = worksheet.get_all_values()
-ct = pd.DataFrame(temp_ct[15:], columns=temp_ct[14]).rename(columns={'Total Events': 'Count', 'Event Label': 'ID'})
-ct['Date'] = pd.to_datetime(ct['Date'])
-ct['Date'] = ct['Date'].dt.strftime('%Y/%m/%d')
-ct['type'] = 'ct'
-val = pd.concat([val,ct])
+ct = ct_calc()
+ct = limit_day(ct, s_time, e_time)
 
 # 会員登録の計算
-worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_R'])
-temp_data = worksheet.get_all_values()
-register_R = pd.DataFrame(temp_data[1:], columns=temp_data[0]).rename(columns={'ID': '学生ID', '登録日時': 'Date', '経由点(バナー)': 'ID'})
-register_R = register_R[['Date', 'ID']]
-register_R['pattern'] = register_R['ID'].str[-1]
-temp = register_R.loc[register_R['pattern']=='p']
-temp['ID'] = temp['ID'].str[:-1]
-register_R['ID'].loc[register_R['pattern']=='p'] = temp['ID']
-register_R['Count'] = 1
-register_R['Date'] = register_R['Date'].str.split(' ', expand=True)[0]
-register_R['Date'] = pd.to_datetime(register_R['Date'])
-register_R['Date'] = register_R['Date'].dt.strftime('%Y/%m/%d')
-val_register_R = pd.pivot_table(data = register_R, values = "Count", aggfunc ="count", index = ["Date", "ID"], margins=False, fill_value=0)
-val_register_R = val_register_R.reset_index()
-val_register_R['type'] = 'cv'
-val = pd.concat([val,val_register_R])
+val_register_R = R_calc()
 
 # LINE登録の計算
-worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_L'])
-temp_data = worksheet.get_all_values()
-register_L = pd.DataFrame(temp_data[2:], columns=temp_data[1]).rename(columns={'ID': '学生ID', '登録(フォロー)日時': 'Date', '流入経路詳細': 'ID'})
-register_L = register_L[['Date', 'ID', '学生ID', '卒業年度', '電話番号']].rename(columns={'学生ID': '友だち', '電話番号': 'Count'})
-register_L['pattern'] = register_L['ID'].str[-1]
-temp = register_R.loc[register_L['pattern']=='p']
-temp['ID'] = temp['ID'].str[:-1]
-register_L['ID'].loc[register_L['pattern']=='p'] = temp['ID']
-register_L['Date'] = register_L['Date'].str.split(' ', expand=True)[0]
-register_L['Date'] = pd.to_datetime(register_L['Date'])
-register_L['Date'] = register_L['Date'].dt.strftime('%Y/%m/%d')
-val_register_L = pd.pivot_table(data = register_L, values = "Count", aggfunc ="count", index = ["Date", "ID"], margins=False, fill_value=0)
-val_register_L = val_register_L.reset_index()
-val_register_L['type'] = 'cv'
-val = pd.concat([val,val_register_L])
+val_register_L = L_calc()
 
+val_register = pd.concat([val_register_R, val_register_L])
+val_register = limit_day(val_register, s_time, e_time)
+val_register = make_datetime(val_register)
 
-val['Date'] = pd.to_datetime(val['Date'])
-val['Month'] = val['Date'].dt.strftime("%Y-%m")
-val['Date'] = val['Date'].dt.strftime('%Y/%m/%d')
-val_daily = pd.merge(val, master, left_on='ID', right_on='ID', how='left')
-st.write(val_daily)
+val_daily = pd.merge(imp, ct, on=['Date', 'ID'], how='left')
+val_daily = pd.merge(val_daily, val_register, on=['Date', 'ID'], how='left')
+val_daily = val_daily.loc[val_daily['Imp'] != 0]
+val_daily = calc_per(val_daily)
 
-# val_month = val.
+val_month = val_daily
+val_month['Date'] = pd.to_datetime(val_month['Date'])
+val_month['Month'] = val_month['Date'].dt.strftime('%Y-%m')
+del val_month['Date']
+val_month = val_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV']]
+val_month = val_month.reset_index()
+val_month = calc_per(val_month)
 
-# values_month = pd.DataFrame(whole_data.groupby('Month').sum()['Unique Pageviews']).rename(columns={'Unique Pageviews': 'UU'})
-# temp_values_R = pd.DataFrame(register_R.groupby('Month').count()['ID']).rename(columns={'ID': '登録'})
-# temp_values_L = pd.DataFrame(register_L.groupby('Month').count()['ID']).rename(columns={'ID': 'LINE'})
-# values_month = pd.merge(values_month, temp_values_R, left_index=True, right_index=True, how="left")
-# values_month = pd.merge(values_month, temp_values_L, left_index=True, right_index=True, how="left")
-# values_month = values_month.fillna(0)
+STATUS = list(val_daily['進捗'].unique())
+PLACE = list(val_daily['設置位置'].unique())
+CATEGORY = list(val_daily['ニーズ'].unique())
 
-# st.write(values_month.T)
-# chart = get_chart(values_month)
-# st.altair_chart(chart, use_container_width=True)
+temp_month = val_month
+place = st.selectbox('確認したい"設置場所"を入力してください', PLACE)
+category = st.selectbox('確認したい"カテゴリ"を入力してください', CATEGORY)
+temp_month = temp_month.loc[temp_month['設置位置'] == place]
+temp_month = temp_month.loc[temp_month['ニーズ'] == category]
+# st.write(temp_month)
+
+display_month = temp_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
+st.write(display_month.T)
+
+chart = get_chart(temp_month, 'Imp')
+st.altair_chart(chart, use_container_width=True)
+
+chart = get_chart(temp_month, 'CT')
+st.altair_chart(chart, use_container_width=True)
+
+chart = get_chart(temp_month, 'CV')
+st.altair_chart(chart, use_container_width=True)
+
+chart = get_chart(temp_month, 'CTR')
+st.altair_chart(chart, use_container_width=True)
+
+chart = get_chart(temp_month, 'CVR')
+st.altair_chart(chart, use_container_width=True)

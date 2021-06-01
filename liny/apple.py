@@ -58,6 +58,7 @@ try:
         list(df.index),
         ['google', 'amazon', 'facebook', 'apple']
     )
+    st.write(companies)
 
     if not companies:
         st.error('少なくとも1社は選んでください。')
@@ -70,6 +71,7 @@ try:
         data = pd.melt(data, id_vars=['Date']).rename(
             columns={'value': 'Stock Prices(USD)'}
         )
+        st.write(data)
         chart = (
             alt.Chart(data)
             .mark_line(opacity=0.8, clip=True)
@@ -79,6 +81,6 @@ try:
                 color='Name:N'
             )
         )
-        # st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
 except:
     st.error("おっと！何かエラーが起きているようです。")

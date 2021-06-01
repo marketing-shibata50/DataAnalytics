@@ -10,6 +10,8 @@ from google.oauth2.service_account import Credentials
 import datetime as dt
 from gspread_dataframe import set_with_dataframe
 
+st.write('# SPARKデータ分析')
+
 MEDIA = st.selectbox(
     'どちらのメディアの数字を確認しますか？',
     ('就活市場', 'digmedia')
@@ -166,7 +168,7 @@ if MEDIA == '就活市場':
     sh_spark, sh_member, sh_master = read_spred_keys()
     SP_SHEET, SP_SHEET_REGISTER = read_spred_tab()
 
-    st.write(""" # 表示日数選択 """)
+    st.write(""" ## 表示日数選択 """)
 
     dt_now = dt.datetime.now()
     mindate = dt.date(2021,1,1)
@@ -432,7 +434,7 @@ elif MEDIA == 'digmedia':
     sh_spark, sh_member, sh_master = read_spred_keys()
     SP_SHEET, SP_SHEET_REGISTER = read_spred_tab()
 
-    st.write(""" # 表示日数選択 """)
+    st.write(""" ## 表示日数選択 """)
 
     dt_now = dt.datetime.now()
     mindate = dt.date(2021,1,1)

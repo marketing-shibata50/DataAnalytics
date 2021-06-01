@@ -13,7 +13,7 @@ from gspread_dataframe import set_with_dataframe
 def read_spred_keys():
     # スプレッドシートの読み込み
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    credentials = Credentials.from_service_account_file('spark/service_account.json', scopes=scopes)
+    credentials = Credentials.from_service_account_file('service_account.json', scopes=scopes)
     gc = gspread.authorize(credentials)
 
     SP_SHEET_KEY_SPARK = '1Tg7M8InNGxVmtQD01ujK6tFWTrmEAyU1pxqo9XCFtIg'
@@ -149,7 +149,7 @@ def get_chart(data, span, item):
         alt.Chart(data)
         .mark_line(opacity=0.8, clip=True)
         .encode(
-            x=span,
+            x=span+':T',
             y=alt.Y(item, scale=alt.Scale(domain=(ymin, ymax))),
             color='ID:N'
         )
@@ -204,14 +204,6 @@ val_daily = pd.merge(val_daily, val_register, on=['Date', 'ID'], how='left')
 val_daily = val_daily.loc[val_daily['Imp'] != 0]
 val_daily = calc_per(val_daily)
 
-val_month = val_daily
-val_month['Date'] = pd.to_datetime(val_month['Date'])
-val_month['Month'] = val_month['Date'].dt.strftime('%Y-%m')
-del val_month['Date']
-val_month = val_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV']]
-val_month = val_month.reset_index()
-val_month = calc_per(val_month)
-
 STATUS = list(val_daily['進捗'].unique())
 PLACE = list(val_daily['設置位置'].unique())
 CATEGORY = list(val_daily['ニーズ'].unique())
@@ -225,30 +217,36 @@ temp_daily = val_daily
 temp_daily = temp_daily.loc[temp_daily['設置位置'] == place]
 temp_daily = temp_daily.loc[temp_daily['ニーズ'] == category]
 
-st.write(temp_daily)
-
 display_daily = temp_daily.groupby(['Date', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
 st.write(display_daily.T)
 
 st.write('### Imp')
-chart = get_chart(temp_daily, 'daily', 'Imp')
+chart = get_chart(temp_daily, 'Date', 'Imp')
 st.altair_chart(chart, use_container_width=True)
 
 st.write('### CT')
-chart = get_chart(temp_daily, 'daily', 'CT')
+chart = get_chart(temp_daily, 'Date', 'CT')
 st.altair_chart(chart, use_container_width=True)
 
 st.write('### CV')
-chart = get_chart(temp_daily, 'daily', 'CV')
+chart = get_chart(temp_daily, 'Date', 'CV')
 st.altair_chart(chart, use_container_width=True)
 
 st.write('### CTR')
-chart = get_chart(temp_daily, 'daily', 'CTR')
+chart = get_chart(temp_daily, 'Date', 'CTR')
 st.altair_chart(chart, use_container_width=True)
 
 st.write('### CVR')
-chart = get_chart(temp_daily, 'daily', 'CVR')
+chart = get_chart(temp_daily, 'Date', 'CVR')
 st.altair_chart(chart, use_container_width=True)
+
+val_month = val_daily
+val_month['Date'] = pd.to_datetime(val_month['Date'])
+val_month['Month'] = val_month['Date'].dt.strftime('%Y-%m')
+del val_month['Date']
+val_month = val_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV']]
+val_month = val_month.reset_index()
+val_month = calc_per(val_month)
 
 st.write('## 月別データ')
 temp_month = val_month

@@ -225,6 +225,8 @@ temp_daily = val_daily
 temp_daily = temp_daily.loc[temp_daily['設置位置'] == place]
 temp_daily = temp_daily.loc[temp_daily['ニーズ'] == category]
 
+st.write(temp_daily)
+
 display_daily = temp_daily.groupby(['Date', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
 st.write(display_daily.T)
 

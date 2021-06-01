@@ -15,6 +15,7 @@ MEDIA = st.selectbox(
     ('就活市場', 'digmedia')
 )
 if MEDIA == '就活市場':
+    st.write('# 就活市場の広告データ')
     def read_spred_keys():
         # スプレッドシートの読み込み
         scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
@@ -282,6 +283,7 @@ if MEDIA == '就活市場':
     st.altair_chart(chart, use_container_width=True)
 
 elif MEDIA == 'digmedia':
+    st.write('# digmediaの広告データ')
     def read_spred_keys():
         # スプレッドシートの読み込み
         scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']

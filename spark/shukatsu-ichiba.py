@@ -216,14 +216,43 @@ STATUS = list(val_daily['進捗'].unique())
 PLACE = list(val_daily['設置位置'].unique())
 CATEGORY = list(val_daily['ニーズ'].unique())
 
-temp_month = val_month
 place = st.selectbox('確認したい"設置場所"を入力してください', PLACE)
 category = st.selectbox('確認したい"カテゴリ"を入力してください', CATEGORY)
+
+st.write('## 日別データ')
+
+temp_daily = val_daily
+temp_daily = temp_daily.loc[temp_daily['設置位置'] == place]
+temp_daily = temp_daily.loc[temp_daily['ニーズ'] == category]
+
+display_daily = temp_daily.groupby(['Date', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
+st.write(display_daily.T)
+
+st.write('### Imp')
+chart = get_chart(temp_daily, 'daily', 'Imp')
+st.altair_chart(chart, use_container_width=True)
+
+st.write('### CT')
+chart = get_chart(temp_daily, 'daily', 'CT')
+st.altair_chart(chart, use_container_width=True)
+
+st.write('### CV')
+chart = get_chart(temp_daily, 'daily', 'CV')
+st.altair_chart(chart, use_container_width=True)
+
+st.write('### CTR')
+chart = get_chart(temp_daily, 'daily', 'CTR')
+st.altair_chart(chart, use_container_width=True)
+
+st.write('### CVR')
+chart = get_chart(temp_daily, 'daily', 'CVR')
+st.altair_chart(chart, use_container_width=True)
+
+st.write('## 月別データ')
+temp_month = val_month
 temp_month = temp_month.loc[temp_month['設置位置'] == place]
 temp_month = temp_month.loc[temp_month['ニーズ'] == category]
 
-
-st.write('## 月別データ')
 display_month = temp_month.groupby(['Month', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
 st.write(display_month.T)
 

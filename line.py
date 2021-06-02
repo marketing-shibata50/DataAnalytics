@@ -31,6 +31,7 @@ if MEDIA == '就活市場':
         register_L['Month'] = register_L['登録(フォロー)日時'].dt.strftime("%Y-%m")
         return register_L
 
+    @st.cache
     def get_data():
         db = pd.DataFrame()
         db = get_spred()

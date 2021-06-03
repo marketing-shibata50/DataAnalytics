@@ -188,7 +188,7 @@ if MEDIA == '就活市場':
     master = master[['ID', '進捗', '担当', 'ニーズ', '設置位置']]
     master = master.replace(r'^\s*$', 0, regex=True)
     master = master.loc[master['ID']!=0]
-    st.write('## 広告IDの確認', master.set_index('ID').sort_index().T)
+    st.write('## 広告IDの確認', master[['ID', '担当', 'ニーズ', '進捗']].set_index('ID').sort_index().T)
 
     # 表示回数の計算
     imp = imp_calc()
@@ -456,7 +456,7 @@ elif MEDIA == 'digmedia':
     master = master[['ID', '進捗', '担当', 'ニーズ', '設置位置']]
     master = master.replace(r'^\s*$', 0, regex=True)
     master = master.loc[master['ID']!=0]
-    st.write('## 広告IDの確認', master.set_index('ID').sort_index().T)
+    st.write('## 広告IDの確認', master[['ID', '担当', 'ニーズ', '進捗']].set_index('ID').sort_index().T)
 
     # 表示回数の計算
     imp = imp_calc()

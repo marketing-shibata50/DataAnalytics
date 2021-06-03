@@ -112,7 +112,7 @@ if MEDIA == '就活市場':
         worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_IMP'])
         temp_imp = worksheet.get_all_values()
         imp = pd.DataFrame(temp_imp[6:], columns=temp_imp[4]).rename(columns={'ID': 'Date'})
-        imp = pd.melt(imp, id_vars=['Date']).rename(columns={'value': 'Imp', 'variable': 'ID'})
+        imp = pd.melt(imp, id_vars=imp['Date']).rename(columns={'value': 'Imp', 'variable': 'ID'})
         imp = imp.replace(r'^\s*$', 0, regex=True)
         imp['Imp'] = imp['Imp'].astype(int)
         return make_datetime(imp)

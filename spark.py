@@ -216,7 +216,7 @@ if MEDIA == '就活市場':
     STATUS = list(val_daily['進捗'].unique())
     PLACE = list(val_daily['設置位置'].unique())
     CATEGORY = list(val_daily['ニーズ'].unique())
-    st.write('## 更新状況の確認', val_register.set_index('Date').tail().T)
+    st.write('## 更新状況の確認', val_register.set_index('Date').sort_index().tail().T)
     st.write('## 分析する広告設定')
     place = st.selectbox('確認したい"設置場所"を入力してください', PLACE)
     category = st.selectbox('確認したい"カテゴリ"を入力してください', CATEGORY)
@@ -485,7 +485,7 @@ elif MEDIA == 'digmedia':
     PLACE = list(val_daily['設置位置'].unique())
     CATEGORY = list(val_daily['ニーズ'].unique())
 
-    st.write('## 更新状況の確認', val_register.set_index('Date').tail().T)
+    st.write('## 更新状況の確認', val_register.set_index('Date').sort_index().tail().T)
     st.write('## 分析する広告設定')
     place = st.selectbox('確認したい"設置場所"を入力してください', PLACE)
     category = st.selectbox('確認したい"カテゴリ"を入力してください', CATEGORY)

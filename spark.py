@@ -107,7 +107,7 @@ if MEDIA == '就活市場':
         temp_db['Date'] = temp_db['Date'].dt.strftime('%Y/%m/%d')
         return temp_db
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def imp_calc():
         worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_IMP'])
         temp_imp = worksheet.get_all_values()
@@ -117,7 +117,7 @@ if MEDIA == '就活市場':
         imp['Imp'] = imp['Imp'].astype(int)
         return make_datetime(imp)
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def ct_calc():
         worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_CT'])
         temp_ct = worksheet.get_all_values()
@@ -131,14 +131,14 @@ if MEDIA == '就活市場':
         ct = ct.reset_index()
         return make_datetime(ct)
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def R_calc():
         worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_R'])
         temp_data = worksheet.get_all_values()
         register_R = pd.DataFrame(temp_data[1:], columns=temp_data[0]).rename(columns={'ID': '学生ID', '登録日時': 'Date', '経由点(バナー)': 'ID'})
         return make_register(register_R)
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def L_calc():
         worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_L'])
         temp_data = worksheet.get_all_values()
@@ -377,7 +377,7 @@ elif MEDIA == 'digmedia':
         temp_db['Date'] = temp_db['Date'].dt.strftime('%Y/%m/%d')
         return temp_db
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def imp_calc():
         worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_IMP'])
         temp_imp = worksheet.get_all_values()
@@ -387,7 +387,7 @@ elif MEDIA == 'digmedia':
         imp['Imp'] = imp['Imp'].astype(int)
         return make_datetime(imp)
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def ct_calc():
         worksheet = sh_spark.worksheet(SP_SHEET['SP_SHEET_CT'])
         temp_ct = worksheet.get_all_values()
@@ -401,14 +401,14 @@ elif MEDIA == 'digmedia':
         ct = ct.reset_index()
         return make_datetime(ct)
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def R_calc():
         worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_R'])
         temp_data = worksheet.get_all_values()
         register_R = pd.DataFrame(temp_data[1:], columns=temp_data[0]).rename(columns={'登録日時': 'Date'})
         return make_register(register_R)
 
-    # @st.cache(allow_output_mutation=True)
+    @st.cache(allow_output_mutation=True)
     def L_calc():
         worksheet = sh_member.worksheet(SP_SHEET_REGISTER['SP_SHEET_L'])
         temp_data = worksheet.get_all_values()

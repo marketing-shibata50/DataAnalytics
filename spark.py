@@ -78,6 +78,8 @@ if MEDIA == '就活市場':
         db['pattern'] = db['ID'].str[-1]
         temp = db.loc[db['pattern']=='p']
         temp['ID'] = temp['ID'].str[:-1]
+        temp = db.loc[db['pattern']=='-']
+        temp['ID'] = temp['ID'].str[:-1]
         db['ID'].loc[db['pattern']=='p'] = temp['ID']
         db['CV'] = 1
         db['Date'] = db['Date'].str.split(' ', expand=True)[0]
@@ -394,6 +396,8 @@ elif MEDIA == 'digmedia':
         ct = pd.DataFrame(temp_ct[15:], columns=temp_ct[14]).rename(columns={'Total Events': 'CT', 'Event Label': 'ID'})
         ct['pattern'] = ct['ID'].str[-1]
         temp = ct.loc[ct['pattern']=='p']
+        temp['ID'] = temp['ID'].str[:-1]
+        temp = ct.loc[ct['pattern']=='-']
         temp['ID'] = temp['ID'].str[:-1]
         ct['ID'].loc[ct['pattern']=='p'] = temp['ID']
         ct['CT'] = ct['CT'].astype(int)

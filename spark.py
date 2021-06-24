@@ -78,8 +78,7 @@ if MEDIA == '就活市場':
         db['pattern'] = db['ID'].str[-1]
         temp = db.loc[db['pattern']=='p']
         temp['ID'] = temp['ID'].str[:-1]
-        temp = db.loc[db['pattern']=='-']
-        temp['ID'] = temp['ID'].str[:-1]
+
         db['ID'].loc[db['pattern']=='p'] = temp['ID']
         db['CV'] = 1
         db['Date'] = db['Date'].str.split(' ', expand=True)[0]
@@ -229,7 +228,7 @@ if MEDIA == '就活市場':
     temp_daily = temp_daily.loc[temp_daily['設置位置'] == place]
     temp_daily = temp_daily.loc[temp_daily['ニーズ'] == category]
 
-    display_daily = temp_daily.groupby(['Date', 'ID']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
+    display_daily = temp_daily.groupby(['Date', 'ID', '進捗']).sum()[['Imp', 'CT', 'CV', 'CTR', 'CVR']]
     st.write(display_daily.T)
 
     st.write('### Imp')

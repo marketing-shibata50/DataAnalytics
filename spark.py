@@ -40,7 +40,7 @@ if MEDIA == '就活市場':
             'SP_SHEET_CT': '【更新】クリック'
         }
         SP_SHEET_REGISTER = {
-            'SP_SHEET_R': '貼付：会員登録',
+            'SP_SHEET_R': '貼付：就活市場',
             'SP_SHEET_L': '貼付：Liny'
         }
         return SP_SHEET, SP_SHEET_REGISTER

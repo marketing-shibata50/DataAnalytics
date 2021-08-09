@@ -25,7 +25,7 @@ if MEDIA == '就活市場':
         gc = gspread.authorize(credentials)
 
         SP_SHEET_KEY_SPARK = '1Tg7M8InNGxVmtQD01ujK6tFWTrmEAyU1pxqo9XCFtIg'
-        SP_SHEET_KEY_MEMBER = '13QemJFcysc703EpF7PsnJWDQyO6KiXFPWiGBkQ-cw6U'
+        SP_SHEET_KEY_MEMBER = '1lyzLKsi4FzIvhehg2EmCMFnPaSIfROrZLkoaD_xyghU'
         SP_SHEET_KEY_MASTER = '1oeORQTjudO9-B4JjyFqilHtrOQtlvOmdUNEp8NnwSzI'
 
         sh_spark = gc.open_by_key(SP_SHEET_KEY_SPARK)
